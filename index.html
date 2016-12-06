@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Use correct character set. -->
+  <meta charset="utf-8">
+  <!-- Tell IE to use the latest, best version. -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+  <title>Cesium Loading</title>
+  <script src="Cesium/Cesium/Cesium.js"></script>
+  <style>
+    @import url(Cesium/Cesium/Widgets/widgets.css);
+      html, body, #cesiumContainer {
+        position: absolute;
+        width: 100%;
+        bottom: 0px;
+        top: 0px;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+
+      .cesium-widget-credits {
+        display: none !important;
+      }
+
+
+      #loading-overlay {
+        position: absolute;
+        left: 0px;
+        right: 0px;
+        top: 0px;
+        bottom: 0px;
+        pointer-events: none;
+        z-index: 9999;
+        background: rgba(255,255,255,1) url("loading.gif") no-repeat;
+        background-position: center;
+        opacity: 1;
+      }
+
+  </style>
+</head>
+<body>
+
+    <div id="cesiumContainer"></div>
+
+    <div id="loading-overlay"></div>
+
+    <script>
+
+    var viewer = new Cesium.Viewer('cesiumContainer');
+
+    var loaded = false;
+
+    function checkLoad() {
+        if (!loaded) {
+            var numTiles = viewer.scene.globe._surface._tileLoadQueue.length;
+            console.log(numTiles);
+            if (numTiles === 0) {
+                loaded = true;
+                // Hide the loading overlay.
+                document.getElementById("loading-overlay").style.display = "none";
+            }
+            else {
+                setTimeout(checkLoad, 100);
+            }
+        }
+    }
+
+    function zoomToHome() {
+        viewer.camera.flyTo({
+            destination : Cesium.Cartesian3.fromRadians(-2.714134211286325, 0.33236701052929585, 10),
+            orientation: {
+                pitch: -0.23273894173188325,
+                heading: 0.3754522005172083,
+                roll: 0.0
+            },
+            duration: 0.0
+        });
+    }
+
+    zoomToHome();
+
+    // Delay a checkload to give Cesium to start loading tiles.
+    setTimeout(checkLoad, 2000);
+
+    </script>
+
+</body>
+</html>
+
+
